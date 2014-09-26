@@ -729,6 +729,8 @@ textarea {
     }
 }
 
-p {
-  font-size: 28px;
+.icon {
+  display: inline-block;
+  width: 25px;
+  height: 25px;
 }

@@ -1,21 +1,4 @@
-<!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8">        <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9">               <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js">                      <!--<![endif]-->
-
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Home | Troy Warr</title>
-    <meta name="description" content="Troy Warr's page.">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="styles/main.min.css">
-  </head>
-
-  <body>
-
-    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="0" height="0" style="position:absolute">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="0" height="0" style="position:absolute">
 
     <symbol id="icon-facebook" viewBox="0 0 32 32">
         <path stroke="#449FDB" d="M0 0"/><path d="M0 24.57V7.43q0-2.125 1.51-3.634t3.633-1.51h17.143q2.125 0 3.634 1.51t1.51 3.634V24.57q0 2.126-1.51 3.635t-3.634 1.51h-3.43V18.856h3.626l.536-4h-4.16v-2.554q0-.964.5-1.482t1.713-.517l2.358-.018V6.59q-1.714-.162-3.214-.162-2.43 0-3.893 1.438t-1.463 4.027v2.964h-4v4h4v10.857H5.143q-2.125 0-3.634-1.51T0 24.572z"/>
@@ -41,29 +24,3 @@
         <path stroke="#449FDB" d="M0 0"/><path d="M.786 24.84q.625.07 1.393.07 4.017 0 7.16-2.464-1.875-.036-3.357-1.152t-2.036-2.848q.59.09 1.09.09.767 0 1.517-.197-2-.412-3.313-1.992t-1.312-3.67v-.07q1.214.678 2.607.73-1.18-.785-1.875-2.053t-.696-2.75q0-1.57.786-2.91 2.16 2.66 5.26 4.258t6.633 1.777q-.143-.68-.143-1.32 0-2.394 1.688-4.08t4.08-1.69q2.5 0 4.214 1.822 1.946-.375 3.66-1.393-.66 2.053-2.535 3.178 1.66-.18 3.32-.893-1.195 1.75-2.892 2.982.018.25.018.75 0 2.32-.68 4.634t-2.062 4.44-3.294 3.758-4.607 2.607-5.77.973q-4.838 0-8.856-2.59z"/>
     </symbol>
 </svg>
-
-    <!--[if lt IE 7]>
-      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/" target="_blank">upgrade your browser</a> to improve your experience.</p>
-    <![endif]-->
-
-    <svg class="icon"><use xlink:href="#icon-facebook"></use></svg>
-    <svg class="icon"><use xlink:href="#icon-github"></use></svg>
-    <svg class="icon"><use xlink:href="#icon-google-plus"></use></svg>
-    <svg class="icon"><use xlink:href="#icon-linked-in"></use></svg>
-    <svg class="icon"><use xlink:href="#icon-stack-overflow"></use></svg>
-    <svg class="icon"><use xlink:href="#icon-twitter"></use></svg>
-
-    <script src="scripts/main.min.js"></script>
-    <script>
-      // TODO: change UA-XXXXX-X to site ID
-      (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
-      function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
-      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
-      e.src='//www.google-analytics.com/analytics.js';
-      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
-      ga('create','UA-XXXXX-X');ga('send','pageview');
-    </script>
-
-  </body>
-
-</html>
