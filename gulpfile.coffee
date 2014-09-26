@@ -51,10 +51,10 @@ gulp.task 'clean', (done) ->
 
 
 
-# copy CNAME (required for GitHub Pages custom domain)
-gulp.task 'cname', ->
+# copy root directory files (CNAME, robots.txt, etc.)
+gulp.task 'root', ->
   gulp
-    .src "#{paths.src}CNAME"
+    .src "#{paths.src}root/**/*"
     .pipe gulp.dest paths.dist
 
 
@@ -110,7 +110,7 @@ gulp.task 'scripts', ->
   streamBuild.queue(
     gulp
       .src [
-        "#{paths.src}scripts/lib/**/*.*"
+        "#{paths.src}scripts/lib/**/*.coffee"
         "#{paths.src}scripts/main.coffee"
       ]
       .pipe coffee()
@@ -178,12 +178,15 @@ gulp.task 'watch', ->
   gulp.watch "#{paths.src}styles/**/*", ['styles']
   gulp.watch "#{paths.src}scripts/**/*", ['scripts']
   gulp.watch "#{paths.src}images/**/*", ['images']
-  gulp.watch ["#{paths.src}*.html", "#{paths.src}icons/*.*"], ['html']
+  gulp.watch [
+    "#{paths.src}*.html"
+    "#{paths.src}icons/*.svg"
+  ], ['html']
 
 
 
 # default task: call with 'gulp' on command line
 gulp.task 'default', ->
-  runSequence 'clean', 'cname', 'html', 'styles', 'scripts', 'images', ->
+  runSequence 'clean', 'root', 'html', 'styles', 'scripts', 'images', ->
     if DEV
       runSequence 'watch', 'browser-sync'
