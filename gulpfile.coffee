@@ -17,6 +17,8 @@ yargs =       require 'yargs'
 browserSync = require 'browser-sync'
 svgSprite =   require 'gulp-svg-sprites'
 
+
+
 # environment
 PROD = yargs.argv.prod
 DEV = !PROD
@@ -27,6 +29,7 @@ paths =
   dist: 'dist/'
   bower: 'bower_components/'
   npm: 'node_modules/'
+  start: 'index.html'
 
 
 
@@ -38,7 +41,7 @@ gulp.task 'browser-sync', ->
       directory: true
     port: 2000
     browser: 'google chrome'
-    startPath: '/index.html'
+    startPath: paths.start
 
 
 
