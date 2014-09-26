@@ -170,7 +170,7 @@ gulp.task 'watch', ->
   gulp.watch "#{paths.src}styles/**/*", ['styles']
   gulp.watch "#{paths.src}scripts/**/*", ['scripts']
   gulp.watch "#{paths.src}images/**/*", ['images']
-  gulp.watch "#{paths.src}*.html", ['html']
+  gulp.watch ["#{paths.src}*.html", "#{paths.src}icons/*.*"], ['html']
 
 
 

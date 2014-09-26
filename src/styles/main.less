@@ -1,10 +1,61 @@
-@import 'lib/lesshat.less';
+@import 'vendor/lesshat.less';
+@import 'lib/mixins.less';
+
+
+// fonts
+
+@import url(http://fonts.googleapis.com/css?family=PT+Sans+Narrow:400,700);
+
+@ptSansNarrow: {
+  font-family: 'PT Sans Narrow', sans-serif;
+  font-weight: 400;
+};
+
+@ptSansNarrowBold: {
+  font-family: 'PT Sans Narrow', sans-serif;
+  font-weight: 700;
+};
 
 
 // basic layout
 
 body {
+  background-color: #09c;
+  color: #fff;
+}
 
+h1 {
+  @ptSansNarrow();
+  font-size: 36px;
+  text-align: center;
+  margin: 4em 0 0.5em;
+  text-align: center;
+}
+
+.social-icons {
+  .clearFix();
+  list-style: none;
+  border: 5px solid #fff;
+  display: table;
+  margin: 0 auto;
+  padding: 15px 15px 6px;
+
+  li {
+    float: left;
+
+    & + li {
+      margin-left: 1em;
+    }
+
+    a {
+      .opacity(0.7);
+      .transition(opacity 0.2s ease);
+
+      &:hover {
+        .opacity(1);
+      }
+    }
+  }
 }
 
 
@@ -12,6 +63,25 @@ body {
 
 .icon {
   display: inline-block;
-  width: 30px;
-  height: 30px;
+  .box(30px);
+  fill: #fff;
+}
+
+.icon-facebook {
+  .box(36px);
+  margin-top: -3px;
+}
+
+.icon-twitter {
+  .box(38px);
+  margin-top: -4px;
+}
+
+.icon-google-plus {
+  .box(32px);
+}
+
+.icon-github {
+  .box(32px);
+  margin-top: -1px;
 }
