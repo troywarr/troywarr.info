@@ -8,11 +8,13 @@ imageMin =    require 'gulp-imagemin'
 uglify =      require 'gulp-uglify'
 coffee =      require 'gulp-coffee'
 gulpIf =      require 'gulp-if'
+fileInclude = require 'gulp-file-include'
 pngCrush =    require 'imagemin-pngcrush'
 del =         require 'del'
 streamQueue = require 'streamqueue'
 yargs =       require 'yargs'
 browserSync = require 'browser-sync'
+svgSprite =   require 'gulp-svg-sprites'
 
 # environment
 PROD = yargs.argv.prod
@@ -25,11 +27,23 @@ paths =
   bower: 'bower_components/'
   npm: 'node_modules/'
 
+# SVG icon sprite
+#   see: http://css-tricks.com/svg-sprites-use-better-icon-fonts/
+# TODO: set up PNG fallback (see: https://www.npmjs.org/package/gulp-svg-sprites)
+gulp.task 'svg-icons', ->
+  gulp
+    .src "#{paths.src}icons/*.svg"
+    .pipe svgSprite
+      selector: 'icon-%f'
+      preview: DEV and { sprite: 'index.html' } # TODO: file bug; setting not honored?
+      mode: 'symbols'
+    .pipe gulp.dest "#{paths.dist}icons/"
+
 # BrowserSync
 gulp.task 'browser-sync', ->
   browserSync
     server:
-      baseDir: './dist/'
+      baseDir: paths.dist
     port: 2000
     browser: 'google chrome'
     startPath: '/index.html'
@@ -46,18 +60,21 @@ gulp.task 'styles', ->
 
   # vendor styles
   streamBuild.queue(
-    gulp.src [
-      "#{paths.npm}normalize.css/normalize.css"
-      "#{paths.src}styles/vendor/main.css" # from HTML5 Boilerplate
-    ]
+    gulp
+      .src [
+        "#{paths.npm}normalize.css/normalize.css"
+        "#{paths.src}styles/vendor/main.css" # from HTML5 Boilerplate
+      ]
   )
 
   # main styles
   streamBuild.queue(
-    gulp.src "#{paths.src}styles/*.less"
+    gulp
+      .src "#{paths.src}styles/*.less"
       .pipe less()
   )
 
+  # combine
   streamBuild.done()
     .pipe concat 'main.min.css'
     .pipe gulpIf PROD, minifyCSS()
@@ -72,22 +89,25 @@ gulp.task 'scripts', ->
 
   # javascript
   streamBuild.queue(
-    gulp.src [
-      "#{paths.npm}jquery/dist/jquery.js"
-      "#{paths.npm}underscore/underscore.js"
-      "#{paths.src}scripts/vendor/modernizr.js"
-    ]
+    gulp
+      .src [
+        "#{paths.npm}jquery/dist/jquery.js"
+        "#{paths.npm}underscore/underscore.js"
+        "#{paths.src}scripts/vendor/modernizr.js"
+      ]
   )
 
   # coffeescript
   streamBuild.queue(
-    gulp.src [
-      "#{paths.src}scripts/lib/**/*.*"
-      "#{paths.src}scripts/main.coffee"
-    ]
+    gulp
+      .src [
+        "#{paths.src}scripts/lib/**/*.*"
+        "#{paths.src}scripts/main.coffee"
+      ]
       .pipe coffee()
   )
 
+  # combine
   streamBuild.done()
     .pipe concat 'main.min.js'
     .pipe gulpIf PROD, uglify()
@@ -111,9 +131,11 @@ gulp.task 'images', ->
     .pipe gulp.dest "#{paths.dist}images/"
 
 # copy HTML
-gulp.task 'html', ->
+gulp.task 'html', ['svg-icons'], ->
   gulp
     .src "#{paths.src}*.html"
+    .pipe fileInclude
+      basepath: paths.dist
     .pipe gulp.dest paths.dist
 
 # reload all browsers
@@ -128,7 +150,7 @@ gulp.task 'watch', ->
   gulp.watch "#{paths.src}images/**/*", ['images', 'bs-reload']
   gulp.watch "#{paths.src}*.html", ['html', 'bs-reload']
 
-# default task (DEVELOPMENT): call with 'gulp' on command line
+# default task: call with 'gulp' on command line
 gulp.task 'default', ['clean', 'browser-sync'], ->
   if PROD
     gulp.start 'html', 'styles', 'scripts', 'images'

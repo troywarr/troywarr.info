@@ -1,16 +1,9 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]>
-  <html class="no-js lt-ie9 lt-ie8 lt-ie7">
-<![endif]-->
-<!--[if IE 7]>
-  <html class="no-js lt-ie9 lt-ie8">
-<![endif]-->
-<!--[if IE 8]>
-  <html class="no-js lt-ie9">
-<![endif]-->
-<!--[if gt IE 8]><!-->
-  <html class="no-js">
-<!--<![endif]-->
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8">        <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9">               <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js">                      <!--<![endif]-->
+
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -19,16 +12,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="styles/main.min.css">
   </head>
+
   <body>
+
+    @@include('./icons/svg/symbols.svg')
+
     <!--[if lt IE 7]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/" target="_blank">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
 
-    <p>Test</p>
+    <svg class="icon"><use xlink:href="#icon-facebook"></use></svg>
+    <svg class="icon"><use xlink:href="#icon-github"></use></svg>
+    <svg class="icon"><use xlink:href="#icon-google-plus"></use></svg>
+    <svg class="icon"><use xlink:href="#icon-linked-in"></use></svg>
+    <svg class="icon"><use xlink:href="#icon-stack-overflow"></use></svg>
+    <svg class="icon"><use xlink:href="#icon-twitter"></use></svg>
 
     <script src="scripts/main.min.js"></script>
-    <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
     <script>
+      // TODO: change UA-XXXXX-X to site ID
       (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
       function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
       e=o.createElement(i);r=o.getElementsByTagName(i)[0];
@@ -36,5 +38,7 @@
       r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
       ga('create','UA-XXXXX-X');ga('send','pageview');
     </script>
+
   </body>
+
 </html>
