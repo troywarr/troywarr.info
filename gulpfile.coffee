@@ -51,6 +51,14 @@ gulp.task 'clean', (done) ->
 
 
 
+# copy CNAME (required for GitHub Pages custom domain)
+gulp.task 'cname', ->
+  gulp
+    .src "#{paths.src}CNAME"
+    .pipe gulp.dest paths.dist
+
+
+
 # compile LESS, combine with vendor CSS & minify
 #   see: https://github.com/gulpjs/gulp/blob/master/docs/recipes/using-multiple-sources-in-one-task.md
 gulp.task 'styles', ->
@@ -176,9 +184,6 @@ gulp.task 'watch', ->
 
 # default task: call with 'gulp' on command line
 gulp.task 'default', ->
-  runSequence 'clean', ->
-    if PROD
-      gulp.start 'html', 'styles', 'scripts', 'images'
-    else if DEV
-      runSequence 'html', 'styles', 'scripts', 'images', ->
-        gulp.start 'watch', 'browser-sync'
+  runSequence 'clean', 'cname', 'html', 'styles', 'scripts', 'images', ->
+    if DEV
+      runSequence 'watch', 'browser-sync'
