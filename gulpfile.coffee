@@ -9,6 +9,7 @@ uglify =      require 'gulp-uglify'
 coffee =      require 'gulp-coffee'
 gulpIf =      require 'gulp-if'
 fileInclude = require 'gulp-file-include'
+runSequence = require 'run-sequence'
 pngCrush =    require 'imagemin-pngcrush'
 del =         require 'del'
 streamQueue = require 'streamqueue'
@@ -27,30 +28,25 @@ paths =
   bower: 'bower_components/'
   npm: 'node_modules/'
 
-# SVG icon sprite
-#   see: http://css-tricks.com/svg-sprites-use-better-icon-fonts/
-# TODO: set up PNG fallback (see: https://www.npmjs.org/package/gulp-svg-sprites)
-gulp.task 'svg-icons', ->
-  gulp
-    .src "#{paths.src}icons/*.svg"
-    .pipe svgSprite
-      selector: 'icon-%f'
-      preview: DEV and { sprite: 'index.html' } # TODO: file bug; setting not honored?
-      mode: 'symbols'
-    .pipe gulp.dest "#{paths.dist}icons/"
+
 
 # BrowserSync
 gulp.task 'browser-sync', ->
   browserSync
     server:
       baseDir: paths.dist
+      directory: true
     port: 2000
     browser: 'google chrome'
     startPath: '/index.html'
 
+
+
 # clean out dist folder
 gulp.task 'clean', (done) ->
-  del [paths.dist], done
+  del paths.dist, done
+
+
 
 # compile LESS, combine with vendor CSS & minify
 #   see: https://github.com/gulpjs/gulp/blob/master/docs/recipes/using-multiple-sources-in-one-task.md
@@ -79,8 +75,10 @@ gulp.task 'styles', ->
     .pipe concat 'main.min.css'
     .pipe gulpIf PROD, minifyCSS()
     .pipe gulp.dest "#{paths.dist}styles/"
-    .pipe browserSync.reload
+    .pipe gulpIf DEV, browserSync.reload
       stream: true
+
+
 
 # concat & minify scripts
 gulp.task 'scripts', ->
@@ -112,6 +110,10 @@ gulp.task 'scripts', ->
     .pipe concat 'main.min.js'
     .pipe gulpIf PROD, uglify()
     .pipe gulp.dest "#{paths.dist}scripts/"
+    .pipe gulpIf DEV, browserSync.reload
+      stream: true
+
+
 
 # compress images
 #   see: https://github.com/sindresorhus/gulp-imagemin
@@ -129,6 +131,24 @@ gulp.task 'images', ->
         pngCrush()
       ]
     .pipe gulp.dest "#{paths.dist}images/"
+    .pipe gulpIf DEV, browserSync.reload
+      stream: true
+
+
+
+# SVG icon sprite
+#   see: http://css-tricks.com/svg-sprites-use-better-icon-fonts/
+# TODO: set up PNG fallback (see: https://www.npmjs.org/package/gulp-svg-sprites)
+gulp.task 'svg-icons', ->
+  gulp
+    .src "#{paths.src}icons/*.svg"
+    .pipe svgSprite
+      selector: 'icon-%f'
+      preview: DEV and { sprite: 'index.html' } # TODO: file bug; setting not honored?
+      mode: 'symbols'
+    .pipe gulp.dest "#{paths.dist}icons/"
+
+
 
 # copy HTML
 gulp.task 'html', ['svg-icons'], ->
@@ -137,22 +157,25 @@ gulp.task 'html', ['svg-icons'], ->
     .pipe fileInclude
       basepath: paths.dist
     .pipe gulp.dest paths.dist
+    .pipe browserSync.reload
+      stream: true
 
-# reload all browsers
-#   see: http://www.browsersync.io/docs/gulp/
-gulp.task 'bs-reload', ->
-  if DEV then browserSync.reload()
+
 
 # watch for changes
 gulp.task 'watch', ->
   gulp.watch "#{paths.src}styles/**/*", ['styles']
-  gulp.watch "#{paths.src}scripts/**/*", ['scripts', 'bs-reload']
-  gulp.watch "#{paths.src}images/**/*", ['images', 'bs-reload']
-  gulp.watch "#{paths.src}*.html", ['html', 'bs-reload']
+  gulp.watch "#{paths.src}scripts/**/*", ['scripts']
+  gulp.watch "#{paths.src}images/**/*", ['images']
+  gulp.watch "#{paths.src}*.html", ['html']
+
+
 
 # default task: call with 'gulp' on command line
-gulp.task 'default', ['clean', 'browser-sync'], ->
-  if PROD
-    gulp.start 'html', 'styles', 'scripts', 'images'
-  else if DEV
-    gulp.start 'html', 'styles', 'scripts', 'images', 'watch'
+gulp.task 'default', ->
+  runSequence 'clean', ->
+    if PROD
+      gulp.start 'html', 'styles', 'scripts', 'images'
+    else if DEV
+      runSequence 'html', 'styles', 'scripts', 'images', ->
+        gulp.start 'watch', 'browser-sync'
