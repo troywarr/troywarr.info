@@ -1,9 +1,9 @@
 troywarr.info
 =============
 
-## General Info
-
 Troy Warr's personal website.
+
+## General Info
 
 This repo contains all of the source code, build processes, and compiled output needed to generate `troywarr.info`.
 
