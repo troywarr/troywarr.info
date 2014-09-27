@@ -1,5 +1,5 @@
 $ ->
 
-  console.log $
-  console.log _
-  console.log Modernizr
+  # Google Analytics
+  googleAnalytics = new window.troyWarr.GoogleAnalytics
+  googleAnalytics.init()
