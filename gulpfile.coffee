@@ -9,13 +9,14 @@ uglify =      require 'gulp-uglify'
 coffee =      require 'gulp-coffee'
 gulpIf =      require 'gulp-if'
 fileInclude = require 'gulp-file-include'
+jade =        require 'gulp-jade'
+svgSprite =   require 'gulp-svg-sprites'
 runSequence = require 'run-sequence'
 pngCrush =    require 'imagemin-pngcrush'
 del =         require 'del'
 streamQueue = require 'streamqueue'
 yargs =       require 'yargs'
 browserSync = require 'browser-sync'
-svgSprite =   require 'gulp-svg-sprites'
 
 
 
@@ -164,7 +165,8 @@ gulp.task 'svg-icons', ->
 # copy HTML
 gulp.task 'html', ['svg-icons'], ->
   gulp
-    .src "#{paths.src}*.html"
+    .src "#{paths.src}*.jade"
+    .pipe jade()
     .pipe fileInclude
       basepath: paths.dist
     .pipe gulp.dest paths.dist
@@ -179,7 +181,7 @@ gulp.task 'watch', ->
   gulp.watch "#{paths.src}scripts/**/*", ['scripts']
   gulp.watch "#{paths.src}images/**/*", ['images']
   gulp.watch [
-    "#{paths.src}*.html"
+    "#{paths.src}*.jade"
     "#{paths.src}icons/*.svg"
   ], ['html']
 

@@ -1,0 +1,58 @@
+doctype html
+html(class="no-js", lang="en")
+
+  head
+    meta(charset="utf-8")
+    meta(http-equiv="X-UA-Compatible", content="IE=edge")
+    title Home | Troy Warr
+    meta(name="description", content="Troy Warr's personal website.")
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+
+    link(rel="stylesheet" href="styles/main.min.css")
+
+  body
+
+    @@include('./icons/svg/symbols.svg')
+
+    <!--[if lt IE 9]>
+    <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/" target="_blank">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+
+    h1 Troy Warr
+
+    ul.social-icons
+      li
+        a(href="http://www.linkedin.com/in/troywarr", target="_blank")
+          svg.icon.icon-linked-in
+            use(xlink:href="#icon-linked-in")
+      li
+        a(href="https://www.facebook.com/troy.warr.1", target="_blank")
+          svg.icon.icon-facebook
+            use(xlink:href="#icon-facebook")
+      li
+        a(href="https://twitter.com/TroyWarr", target="_blank")
+          svg.icon.icon-twitter
+            use(xlink:href="#icon-twitter")
+      li
+        a(href="https://plus.google.com/+TroyWarr1980", target="_blank")
+          svg.icon.icon-google-plus
+            use(xlink:href="#icon-google-plus")
+      li
+        a(href="http://stackoverflow.com/users/167911/bungle", target="_blank")
+          svg.icon.icon-stack-overflow
+            use(xlink:href="#icon-stack-overflow")
+      li
+        a(href="https://github.com/troywarr", target="_blank")
+          svg.icon.icon-github
+            use(xlink:href="#icon-github")
+
+    script(src="scripts/main.min.js")
+
+    //- TODO: change UA-XXXXX-X to site ID
+    script.
+      (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+      function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+      e.src='//www.google-analytics.com/analytics.js';
+      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+      ga('create','UA-XXXXX-X');ga('send','pageview');
