@@ -1,2 +1,3 @@
 place favicon.ico and apple-touch-icon.png in the root directory
 use gulp-browserify to bundle npm dependencies (jquery, underscore, etc.)
+consider improving GitHub Pages deploy process (see: https://github.com/X1011/git-directory-deploy)
