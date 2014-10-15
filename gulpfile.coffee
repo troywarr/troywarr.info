@@ -170,7 +170,7 @@ gulp.task 'html', ['svg-icons'], ->
     .pipe fileInclude
       basepath: paths.dist
     .pipe gulp.dest paths.dist
-    .pipe browserSync.reload
+    .pipe gulpIf DEV, browserSync.reload
       stream: true
 
 
