@@ -26,6 +26,7 @@ DEV = !PROD
 
 # paths
 paths =
+  root: ''
   src: 'src/'
   dist: 'dist/'
   bower: 'bower_components/'
