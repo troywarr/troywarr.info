@@ -1,0 +1,8 @@
+mixin ie(condition)
+  | <!--[!{condition}]>
+  block
+  | <![endif]-->
+
+mixin icon(name)
+  svg.icon(class="icon-#{name}")
+    use(xlink:href="#icon-#{name}")
