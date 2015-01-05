@@ -14,6 +14,7 @@ jade        = require 'jade'
 svgSprite   = require 'gulp-svg-sprites' # TODO: update to gulp-svg-sprite
 frontMatter = require 'gulp-front-matter'
 gulpsmith   = require 'gulpsmith'
+collections = require 'metalsmith-collections'
 markdown    = require 'metalsmith-markdown'
 permalinks  = require 'metalsmith-permalinks'
 templates   = require 'metalsmith-templates'
@@ -176,18 +177,27 @@ gulp.task 'svg-icons', ->
 # generate blog
 gulp.task 'blog', ->
   gulp
-    .src "#{paths.src}/posts/*.md"
+    .src [
+      'posts/*.md'
+      'index.md'
+    ], { cwd: "#{paths.src}/**" }
     .pipe frontMatter()
     .on 'data', (file) ->
       _.assign file, file.frontMatter
       delete file.frontMatter
     .pipe gulpsmith()
+      .use collections
+        posts:
+          pattern: 'posts/*.md'
+          sortBy: 'date'
+          reverse: true
       .use markdown()
-      # .use permalinks()
+      # .use permalinks
+      #   pattern: ':collection/:title'
       .use templates
         engine: 'jade'
         directory: "#{paths.src}/layouts"
-    .pipe gulp.dest "#{paths.dist}/posts"
+    .pipe gulp.dest "#{paths.dist}/blog"
 
 
 
@@ -209,7 +219,11 @@ gulp.task 'watch', ->
   gulp.watch "#{paths.src}/styles/**/*", ['styles']
   gulp.watch "#{paths.src}/scripts/**/*", ['scripts']
   gulp.watch "#{paths.src}/images/**/*", ['images']
-  gulp.watch "#{paths.src}/posts/**/*", ['blog']
+  gulp.watch [
+    "#{paths.src}/posts/**/*.md"
+    "#{paths.src}/layouts/**/*.jade"
+    "#{paths.src}/index.md"
+  ], ['blog']
   gulp.watch [
     "#{paths.src}/*.jade"
     "#{paths.src}/icons/*.svg"
