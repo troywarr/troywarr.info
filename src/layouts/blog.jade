@@ -1,0 +1,10 @@
+doctype html
+html
+  head
+
+  body
+
+    ul
+      each post in self.posts
+        li
+          a(href=post.path + '/index.html')= post.title

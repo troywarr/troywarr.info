@@ -1,9 +1,17 @@
 doctype html
 html
   head
-    title= title
-    meta(name='description', content= description)
+    title= self.title
+    meta(name='description', content=self.description)
   body
-    h1= title
-    time= date
-    div!= contents
+    h1= self.title
+    time= self.date
+    div!= self.contents
+
+    if self.previous
+      .next
+          a(href='../' + self.previous.path + '/index.html')= self.previous.title
+
+    if self.next
+      .next
+          a(href='../' + self.next.path + '/index.html')= self.next.title

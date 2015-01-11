@@ -1,4 +1,4 @@
 ---
-title: Home
-template: index.jade
+template: blog.jade
+permalink: false
 ---

@@ -41,6 +41,7 @@ paths.src        = "#{paths.root}/src"
 paths.dist       = "#{paths.root}/dist"
 paths.bower      = "#{paths.root}/bower_components"
 paths.npm        = "#{paths.root}/node_modules"
+paths.blog       = "#{paths.dist}/blog"
 paths.start      = "index.html" # entry point loaded in browser
 paths.coffeelint = "coffeelint.json"
 
@@ -174,8 +175,14 @@ gulp.task 'svg-icons', ->
 
 
 
+# clean out blog output folder
+gulp.task 'blog:clean', (done) ->
+  del paths.blog, done
+
+
+
 # generate blog
-gulp.task 'blog', ->
+gulp.task 'blog:generate', ['blog:clean'], ->
   gulp
     .src [
       'posts/*.md'
@@ -187,17 +194,22 @@ gulp.task 'blog', ->
       delete file.frontMatter
     .pipe gulpsmith()
       .use collections
+        pages:
+          pattern: 'index.md'
         posts:
           pattern: 'posts/*.md'
           sortBy: 'date'
           reverse: true
       .use markdown()
-      # .use permalinks
-      #   pattern: ':collection/:title'
+      .use permalinks
+        pattern: ':title'
       .use templates
         engine: 'jade'
         directory: "#{paths.src}/layouts"
+        self: true
     .pipe gulp.dest "#{paths.dist}/blog"
+    .pipe gulpIf DEV, browserSync.reload
+      stream: true
 
 
 
@@ -223,7 +235,7 @@ gulp.task 'watch', ->
     "#{paths.src}/posts/**/*.md"
     "#{paths.src}/layouts/**/*.jade"
     "#{paths.src}/index.md"
-  ], ['blog']
+  ], ['blog:generate']
   gulp.watch [
     "#{paths.src}/*.jade"
     "#{paths.src}/icons/*.svg"
@@ -233,6 +245,6 @@ gulp.task 'watch', ->
 
 # default task: call with 'gulp' on command line
 gulp.task 'default', ->
-  runSequence 'clean', 'root', 'html', 'styles', 'scripts', 'images', 'blog', ->
+  runSequence 'clean', 'root', 'html', 'styles', 'scripts', 'images', 'blog:generate', ->
     if DEV
       runSequence 'watch', 'browser-sync'
