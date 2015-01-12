@@ -200,8 +200,8 @@ gulp.task 'icons', ['clean:icons'], ->
 gulp.task 'blog', ['clean:blog'], ->
   gulp
     .src [
-      'posts/*.md'
       'index.md'
+      'posts/*.md'
     ], { cwd: "#{paths.src}/**" }
     .pipe frontMatter()
     .on 'data', (file) ->
@@ -212,7 +212,7 @@ gulp.task 'blog', ['clean:blog'], ->
         pages:
           pattern: 'index.md'
         posts:
-          pattern: '*.md'
+          pattern: 'posts/*.md'
           sortBy: 'date'
           reverse: true
       .use markdown()
