@@ -10,6 +10,7 @@ coffee      = require 'gulp-coffee'
 gulpIf      = require 'gulp-if'
 fileInclude = require 'gulp-file-include'
 gulpJade    = require 'gulp-jade'
+gutil       = require 'gulp-util'
 jade        = require 'jade'
 svgSprite   = require 'gulp-svg-sprites' # TODO: update to gulp-svg-sprite
 frontMatter = require 'gulp-front-matter'
@@ -18,33 +19,26 @@ collections = require 'metalsmith-collections'
 markdown    = require 'metalsmith-markdown'
 permalinks  = require 'metalsmith-permalinks'
 templates   = require 'metalsmith-templates'
-runSequence = require 'run-sequence'
 pngcrush    = require 'imagemin-pngcrush'
 del         = require 'del'
 streamqueue = require 'streamqueue'
-yargs       = require 'yargs'
 browserSync = require 'browser-sync'
 _           = require 'lodash'
 
 
-
-# environment
-PROD = yargs.argv.prod
-DEV = !PROD
-
+# environment shortcuts
+PROD = gutil.env.debug
+DEV  = !PROD
 
 
 # paths
 paths            = {}
-paths.root       = '.'
-paths.src        = "#{paths.root}/src"
-paths.dist       = "#{paths.root}/dist"
-paths.bower      = "#{paths.root}/bower_components"
-paths.npm        = "#{paths.root}/node_modules"
-paths.blog       = "#{paths.dist}/blog"
+paths.base       = '.'
+paths.src        = "#{paths.base}/src"
+paths.dist       = "#{paths.base}/dist"
+paths.bower      = "#{paths.base}/bower_components"
+paths.npm        = "#{paths.base}/node_modules"
 paths.start      = "index.html" # entry point loaded in browser
-paths.coffeelint = "coffeelint.json"
-
 
 
 # BrowserSync
@@ -58,24 +52,59 @@ gulp.task 'browser-sync', ->
     startPath: paths.start
 
 
-
-# clean out dist folder
+# delete entire dist folder
 gulp.task 'clean', (done) ->
   del paths.dist, done
 
 
+# clean 'root' task output
+gulp.task 'clean:root', (done) ->
+  del [
+    "#{paths.dist}/CNAME"
+    "#{paths.dist}/robots.txt"
+  ], done
+
+
+# clean 'html' task output
+gulp.task 'clean:html', (done) ->
+  del "#{paths.dist}/*.html", done
+
+
+# clean 'styles' task output
+gulp.task 'clean:styles', (done) ->
+  del "#{paths.dist}/styles/**/*", done
+
+
+# clean 'scripts' task output
+gulp.task 'clean:scripts', (done) ->
+  del "#{paths.dist}/scripts/**/*", done
+
+
+# clean 'images' task output
+gulp.task 'clean:images', (done) ->
+  del "#{paths.dist}/images/**/*", done
+
+
+# clean 'blog' task output
+gulp.task 'clean:blog', (done) ->
+  del "#{paths.dist}/blog/**/*", done
+
+
+# clean 'icons' task output
+gulp.task 'clean:icons', (done) ->
+  del "#{paths.dist}/icons/**/*", done
+
 
 # copy root directory files (CNAME, robots.txt, etc.)
-gulp.task 'root', ->
+gulp.task 'root', ['clean:root'], ->
   gulp
     .src "#{paths.src}/root/**/*"
     .pipe gulp.dest paths.dist
 
 
-
 # compile LESS, combine with vendor CSS & minify
 #   see: https://github.com/gulpjs/gulp/blob/master/docs/recipes/using-multiple-sources-in-one-task.md
-gulp.task 'styles', ->
+gulp.task 'styles', ['clean:styles'], ->
   streamBuild = streamqueue
     objectMode: true
 
@@ -104,9 +133,8 @@ gulp.task 'styles', ->
       stream: true
 
 
-
 # concat & minify scripts
-gulp.task 'scripts', ->
+gulp.task 'scripts', ['clean:scripts'], ->
   streamBuild = streamqueue
     objectMode: true
 
@@ -135,14 +163,11 @@ gulp.task 'scripts', ->
     .pipe concat 'main.min.js'
     .pipe gulpIf PROD, uglify()
     .pipe gulp.dest "#{paths.dist}/scripts"
-    .pipe gulpIf DEV, browserSync.reload
-      stream: true
-
 
 
 # compress images
 #   see: https://github.com/sindresorhus/gulp-imagemin
-gulp.task 'images', ->
+gulp.task 'images', ['clean:images'], ->
   gulp
     .src "#{paths.src}/images/*"
     .pipe imagemin
@@ -156,15 +181,12 @@ gulp.task 'images', ->
         pngcrush()
       ]
     .pipe gulp.dest "#{paths.dist}/images"
-    .pipe gulpIf DEV, browserSync.reload
-      stream: true
 
 
-
-# SVG icon sprite
+# SVG icons
 #   see: http://css-tricks.com/svg-sprites-use-better-icon-fonts/
 # TODO: set up PNG fallback (see: https://www.npmjs.org/package/gulp-svg-sprites)
-gulp.task 'svg-icons', ->
+gulp.task 'icons', ['clean:icons'], ->
   gulp
     .src "#{paths.src}/icons/*.svg"
     .pipe svgSprite
@@ -174,15 +196,8 @@ gulp.task 'svg-icons', ->
     .pipe gulp.dest "#{paths.dist}/icons"
 
 
-
-# clean out blog output folder
-gulp.task 'blog:clean', (done) ->
-  del paths.blog, done
-
-
-
 # generate blog
-gulp.task 'blog:generate', ['blog:clean'], ->
+gulp.task 'blog', ['clean:blog'], ->
   gulp
     .src [
       'posts/*.md'
@@ -208,43 +223,44 @@ gulp.task 'blog:generate', ['blog:clean'], ->
         directory: "#{paths.src}/layouts"
         self: true
     .pipe gulp.dest "#{paths.dist}/blog"
-    .pipe gulpIf DEV, browserSync.reload
-      stream: true
-
 
 
 # copy HTML
-gulp.task 'html', ['svg-icons'], ->
+gulp.task 'html', ['clean:html', 'icons'], ->
   gulp
     .src "#{paths.src}/*.jade"
     .pipe gulpJade()
     .pipe fileInclude
       basepath: paths.dist
     .pipe gulp.dest paths.dist
-    .pipe gulpIf DEV, browserSync.reload
-      stream: true
 
 
-
-# watch for changes
-gulp.task 'watch', ->
-  gulp.watch "#{paths.src}/styles/**/*", ['styles']
-  gulp.watch "#{paths.src}/scripts/**/*", ['scripts']
-  gulp.watch "#{paths.src}/images/**/*", ['images']
+# development build & watch
+gulp.task 'dev', ['root', 'html', 'styles', 'scripts', 'images', 'blog', 'browser-sync'], ->
+  gulp.watch "#{paths.src}/styles/**/*", ['styles', browserSync.reload]
+  gulp.watch "#{paths.src}/scripts/**/*", ['scripts', browserSync.reload]
+  gulp.watch "#{paths.src}/images/**/*", ['images', browserSync.reload]
   gulp.watch [
     "#{paths.src}/posts/**/*.md"
     "#{paths.src}/layouts/**/*.jade"
     "#{paths.src}/index.md"
-  ], ['blog:generate']
+  ], ['blog', browserSync.reload]
   gulp.watch [
     "#{paths.src}/*.jade"
     "#{paths.src}/icons/*.svg"
-  ], ['html']
+  ], ['html', browserSync.reload]
 
 
+# production build
+gulp.task 'prod', ['root', 'html', 'styles', 'scripts', 'images', 'blog'], ->
 
-# default task: call with 'gulp' on command line
-gulp.task 'default', ->
-  runSequence 'clean', 'root', 'html', 'styles', 'scripts', 'images', 'blog:generate', ->
-    if DEV
-      runSequence 'watch', 'browser-sync'
+
+# build: call with 'gulp build' on command line
+#   use 'gulp build --prod' to prepare assets for production use (minify, etc.)
+gulp.task 'build', ['clean'], ->
+  gulp.run 'prod'
+
+
+# develop: call with 'gulp' on command line
+gulp.task 'default', ['clean'], ->
+  gulp.run 'dev'
