@@ -15,3 +15,8 @@ html
     if self.next
       .next
           a(href='../' + self.next.path + '/index.html')= self.next.title
+
+    #disqus_thread
+
+//- block scripts
+//-   $.getScript('//troywarr.disqus.com/embed.js');

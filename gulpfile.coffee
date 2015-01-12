@@ -197,7 +197,7 @@ gulp.task 'blog:generate', ['blog:clean'], ->
         pages:
           pattern: 'index.md'
         posts:
-          pattern: 'posts/*.md'
+          pattern: '*.md'
           sortBy: 'date'
           reverse: true
       .use markdown()
