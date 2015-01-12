@@ -2,17 +2,20 @@ include ./mixins.jade
 
 
 doctype html
-html(class="no-js" lang="en")
+html.no-js(lang="en")
 
   head
 
-    meta(charset="utf-8")
-    meta(http-equiv="X-UA-Compatible" content="IE=edge")
-    block title
+    meta(charset="UTF-8")
+    meta(http-equiv="X-UA-Compatible" content="IE=edge,chrome=1")
     meta(name="description" content="Troy Warr's personal website.")
+    meta(name="keywords" content="html, css, javascript, coffeescript, web, design, development, developer, front-end, frontend, angular, jquery, node, nodejs")
     meta(name="viewport" content="width=device-width, initial-scale=1")
-
-    link(rel="stylesheet" href="styles/main.min.css")
+    meta(name="author" content="Troy Warr <troy3000@gmail.com>")
+    block title
+    link(rel="shortcut icon" href="../favicon.ico")
+    link(rel="stylesheet" href="styles/index.min.css")
+    script(src="scripts/vendor/modernizr.js")
 
   body
 
@@ -21,33 +24,61 @@ html(class="no-js" lang="en")
     +ie('if lt IE 10')
       p(class="browsehappy") You are using an #[strong outdated] browser. Please #[a(href="http://browsehappy.com/" target="_blank") upgrade your browser] to improve your experience.
 
-    ul.social-icons
-      li
-        a(href="http://www.linkedin.com/in/troywarr" target="_blank")
-          +icon('linked-in')
-      li
-        a(href="https://www.facebook.com/troy.warr.1" target="_blank")
-          +icon('facebook')
-      li
-        a(href="https://twitter.com/TroyWarr" target="_blank")
-          +icon('twitter')
-      li
-        a(href="https://plus.google.com/+TroyWarr1980" target="_blank")
-          +icon('google-plus')
-      li
-        a(href="http://stackoverflow.com/users/167911/bungle" target="_blank")
-          +icon('stack-overflow')
-      li
-        a(href="https://github.com/troywarr" target="_blank")
-          +icon('github')
-      li
-        a(href="https://www.npmjs.org/~troywarr" target="_blank")
-          +icon('npm')
+    main
+      nav.menu
+        h2 Menu
+        ul
+          li
+            a(href="#") Blog
+          li
+            a(href="#") Resume
+          li
+            a(href="#") About
+          li
+            a(href="#") Contact
+      .pusher
+        .content
+          .content-inner
+            .top
+              .hamburger
+                +icon('hamburger')
+            header
+              h1 Something I Learned About Programming #[span A more elaboration description of the aforementioned title]
+            .main
+              .info
+                p If you enjoyed this demo you might also like:</p>
+                p
+                  a(href="#") On Scroll Header Effects
+                p
+                  a(href="#") A Collection of Page Transitions
 
-    nav
-      block nav
+    //- ul.social-icons
+    //-   li
+    //-     a(href="http://www.linkedin.com/in/troywarr" target="_blank")
+    //-       +icon('linked-in')
+    //-   li
+    //-     a(href="https://www.facebook.com/troy.warr.1" target="_blank")
+    //-       +icon('facebook')
+    //-   li
+    //-     a(href="https://twitter.com/TroyWarr" target="_blank")
+    //-       +icon('twitter')
+    //-   li
+    //-     a(href="https://plus.google.com/+TroyWarr1980" target="_blank")
+    //-       +icon('google-plus')
+    //-   li
+    //-     a(href="http://stackoverflow.com/users/167911/bungle" target="_blank")
+    //-       +icon('stack-overflow')
+    //-   li
+    //-     a(href="https://github.com/troywarr" target="_blank")
+    //-       +icon('github')
+    //-   li
+    //-     a(href="https://www.npmjs.org/~troywarr" target="_blank")
+    //-       +icon('npm')
+    //-
+    //- nav
+    //-   block nav
+    //-
+    //- article
+    //-   block article
 
-    article
-      block article
-
-    script(src="scripts/main.min.js")
+    script(src="scripts/index.min.js")

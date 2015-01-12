@@ -118,7 +118,7 @@ gulp.task 'styles', ['clean:styles'], ->
     .src "#{paths.src}/styles/*.less"
     .pipe plumber handleError
     .pipe less()
-    .pipe rename 'main.min.css'
+    .pipe rename 'index.min.css'
     .pipe gulpIf PROD, minifyCSS()
     .pipe gulp.dest "#{paths.dist}/styles"
     .pipe gulpIf DEV, browserSync.reload
@@ -145,6 +145,9 @@ gulp.task 'scripts', ['clean:scripts'], ->
       extname: '.min.js'
     .pipe gulp.dest "#{paths.dist}/scripts"
     .pipe filesize()
+  gulp
+    .src "#{paths.src}/scripts/vendor/modernizr.js"
+    .pipe gulp.dest "#{paths.dist}/scripts/vendor"
 
 
 # compress images
