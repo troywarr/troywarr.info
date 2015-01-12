@@ -27,18 +27,18 @@ _           = require 'lodash'
 
 
 # environment shortcuts
-PROD = gutil.env.debug
+PROD = gutil.env.prod
 DEV  = !PROD
 
 
 # paths
-paths            = {}
-paths.base       = '.'
-paths.src        = "#{paths.base}/src"
-paths.dist       = "#{paths.base}/dist"
-paths.bower      = "#{paths.base}/bower_components"
-paths.npm        = "#{paths.base}/node_modules"
-paths.start      = "index.html" # entry point loaded in browser
+paths       = {}
+paths.base  = '.'
+paths.src   = "#{paths.base}/src"
+paths.dist  = "#{paths.base}/dist"
+paths.bower = "#{paths.base}/bower_components"
+paths.npm   = "#{paths.base}/node_modules"
+paths.start = "index.html" # entry point loaded in browser
 
 
 # BrowserSync
