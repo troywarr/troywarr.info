@@ -3,26 +3,28 @@ gulp        = require 'gulp'
 less        = require 'gulp-less'
 minifyCSS   = require 'gulp-minify-css'
 notify      = require 'gulp-notify'
-concat      = require 'gulp-concat'
+rename      = require 'gulp-rename'
 imagemin    = require 'gulp-imagemin'
 uglify      = require 'gulp-uglify'
-coffee      = require 'gulp-coffee'
 gulpIf      = require 'gulp-if'
 fileInclude = require 'gulp-file-include'
 gulpJade    = require 'gulp-jade'
 gutil       = require 'gulp-util'
-jade        = require 'jade'
-svgSprite   = require 'gulp-svg-sprites' # TODO: update to gulp-svg-sprite
+plumber     = require 'gulp-plumber'
+svgSprite   = require 'gulp-svg-sprite'
 frontMatter = require 'gulp-front-matter'
+filesize    = require 'gulp-filesize'
 gulpsmith   = require 'gulpsmith'
+jade        = require 'jade'
 collections = require 'metalsmith-collections'
 markdown    = require 'metalsmith-markdown'
 permalinks  = require 'metalsmith-permalinks'
 templates   = require 'metalsmith-templates'
 pngcrush    = require 'imagemin-pngcrush'
 del         = require 'del'
-streamqueue = require 'streamqueue'
 browserSync = require 'browser-sync'
+browserify  = require 'browserify'
+transform   = require 'vinyl-transform'
 _           = require 'lodash'
 
 
@@ -41,6 +43,15 @@ paths.npm   = "#{paths.base}/node_modules"
 paths.start = "index.html" # entry point loaded in browser
 
 
+# error handling
+handleError = (err) ->
+  notify.onError(
+    title: 'Gulp Error'
+    message: "#{err.message}"
+  )(err)
+  @emit 'end'
+
+
 # BrowserSync
 gulp.task 'browser-sync', ->
   browserSync
@@ -48,7 +59,6 @@ gulp.task 'browser-sync', ->
       baseDir: paths.dist
       directory: true
     port: 2000
-    browser: 'google chrome'
     startPath: paths.start
 
 
@@ -72,104 +82,77 @@ gulp.task 'clean:html', (done) ->
 
 # clean 'styles' task output
 gulp.task 'clean:styles', (done) ->
-  del "#{paths.dist}/styles/**/*", done
+  del "#{paths.dist}/styles/**/*.*", done
 
 
 # clean 'scripts' task output
 gulp.task 'clean:scripts', (done) ->
-  del "#{paths.dist}/scripts/**/*", done
+  del "#{paths.dist}/scripts/**/*.*", done
 
 
 # clean 'images' task output
 gulp.task 'clean:images', (done) ->
-  del "#{paths.dist}/images/**/*", done
+  del "#{paths.dist}/images/**/*.*", done
 
 
 # clean 'blog' task output
 gulp.task 'clean:blog', (done) ->
-  del "#{paths.dist}/blog/**/*", done
+  del "#{paths.dist}/blog/**/*.*", done
 
 
 # clean 'icons' task output
 gulp.task 'clean:icons', (done) ->
-  del "#{paths.dist}/icons/**/*", done
+  del "#{paths.dist}/icons/**/*.*", done
 
 
 # copy root directory files (CNAME, robots.txt, etc.)
 gulp.task 'root', ['clean:root'], ->
   gulp
-    .src "#{paths.src}/root/**/*"
+    .src "#{paths.src}/root/**/*.*"
     .pipe gulp.dest paths.dist
 
 
-# compile LESS, combine with vendor CSS & minify
-#   see: https://github.com/gulpjs/gulp/blob/master/docs/recipes/using-multiple-sources-in-one-task.md
+# compile LESS & minify
 gulp.task 'styles', ['clean:styles'], ->
-  streamBuild = streamqueue
-    objectMode: true
-
-  # vendor styles
-  streamBuild.queue(
-    gulp
-      .src [
-        "#{paths.npm}/normalize.css/normalize.css"
-        "#{paths.src}/styles/vendor/main.css" # from HTML5 Boilerplate
-      ]
-  )
-
-  # main styles
-  streamBuild.queue(
-    gulp
-      .src "#{paths.src}/styles/*.less"
-      .pipe less()
-  )
-
-  # combine
-  streamBuild.done()
-    .pipe concat 'main.min.css'
+  gulp
+    .src "#{paths.src}/styles/*.less"
+    .pipe plumber handleError
+    .pipe less()
+    .pipe rename 'main.min.css'
     .pipe gulpIf PROD, minifyCSS()
     .pipe gulp.dest "#{paths.dist}/styles"
     .pipe gulpIf DEV, browserSync.reload
       stream: true
 
 
-# concat & minify scripts
+# compile, bundle and minify scripts
+#   see: https://medium.com/@sogko/gulp-browserify-the-gulp-y-way-bb359b3f9623
 gulp.task 'scripts', ['clean:scripts'], ->
-  streamBuild = streamqueue
-    objectMode: true
-
-  # javascript
-  streamBuild.queue(
-    gulp
-      .src [
-        "#{paths.npm}/jquery/dist/jquery.js"
-        "#{paths.npm}/underscore/underscore.js"
-        "#{paths.src}/scripts/vendor/modernizr.js"
-      ]
+  browserified = transform(
+    (filename) ->
+      browserify
+        entries: filename
+        extensions: ['.coffee']
+        debug: true
+      .bundle()
   )
-
-  # coffeescript
-  streamBuild.queue(
-    gulp
-      .src [
-        "#{paths.src}/scripts/lib/**/*.coffee"
-        "#{paths.src}/scripts/main.coffee"
-      ]
-      .pipe coffee()
-  )
-
-  # combine
-  streamBuild.done()
-    .pipe concat 'main.min.js'
+  gulp
+    .src "#{paths.src}/scripts/index.coffee"
+    .pipe plumber handleError
+    .pipe browserified
     .pipe gulpIf PROD, uglify()
+    .pipe rename
+      extname: '.min.js'
     .pipe gulp.dest "#{paths.dist}/scripts"
+    .pipe filesize()
 
 
 # compress images
 #   see: https://github.com/sindresorhus/gulp-imagemin
 gulp.task 'images', ['clean:images'], ->
   gulp
-    .src "#{paths.src}/images/*"
+    .src "#{paths.src}/images/*.*"
+    .pipe plumber handleError
     .pipe imagemin
       progressive: true
       svgoPlugins: [
@@ -183,26 +166,33 @@ gulp.task 'images', ['clean:images'], ->
     .pipe gulp.dest "#{paths.dist}/images"
 
 
-# SVG icons
+# SVG icon sprite
 #   see: http://css-tricks.com/svg-sprites-use-better-icon-fonts/
-# TODO: set up PNG fallback (see: https://www.npmjs.org/package/gulp-svg-sprites)
 gulp.task 'icons', ['clean:icons'], ->
   gulp
-    .src "#{paths.src}/icons/*.svg"
+    .src "#{paths.src}/icons/**/*.svg"
+    .pipe plumber handleError
     .pipe svgSprite
-      selector: 'icon-%f'
-      preview: DEV and { sprite: 'index.html' } # TODO: file bug; setting not honored?
-      mode: 'symbols'
-    .pipe gulp.dest "#{paths.dist}/icons"
+      shape:
+        id:
+          generator: 'icon-'
+      mode:
+        symbol:
+          inline: true
+          example: DEV and { dest: 'example/icons.html' }
+          dest: 'svg'
+          sprite: 'icons.svg'
+    .pipe gulp.dest paths.dist
 
 
-# generate blog
+# generate blog (Metalsmith)
 gulp.task 'blog', ['clean:blog'], ->
   gulp
     .src [
       'index.md'
       'posts/*.md'
     ], { cwd: "#{paths.src}/**" }
+    # .pipe plumber handleError # TODO: why does this suppress blog output?
     .pipe frontMatter()
     .on 'data', (file) ->
       _.assign file, file.frontMatter
@@ -220,15 +210,16 @@ gulp.task 'blog', ['clean:blog'], ->
         pattern: ':title'
       .use templates
         engine: 'jade'
-        directory: "#{paths.src}/layouts"
+        directory: "#{paths.src}/templates"
         self: true
     .pipe gulp.dest "#{paths.dist}/blog"
 
 
-# copy HTML
+# render & copy HTML
 gulp.task 'html', ['clean:html', 'icons'], ->
   gulp
-    .src "#{paths.src}/*.jade"
+    .src "#{paths.src}/pages/*.jade"
+    .pipe plumber handleError
     .pipe gulpJade()
     .pipe fileInclude
       basepath: paths.dist
@@ -236,13 +227,14 @@ gulp.task 'html', ['clean:html', 'icons'], ->
 
 
 # development build & watch
-gulp.task 'dev', ['root', 'html', 'styles', 'scripts', 'images', 'blog', 'browser-sync'], ->
-  gulp.watch "#{paths.src}/styles/**/*", ['styles', browserSync.reload]
-  gulp.watch "#{paths.src}/scripts/**/*", ['scripts', browserSync.reload]
-  gulp.watch "#{paths.src}/images/**/*", ['images', browserSync.reload]
+gulp.task 'dev', ['root', 'html', 'styles', 'scripts', 'images', 'blog'], ->
+  gulp.run 'browser-sync' # run after everything is compiled
+  gulp.watch "#{paths.src}/styles/**/*.less", ['styles', browserSync.reload]
+  gulp.watch "#{paths.src}/scripts/**/*.coffee", ['scripts', browserSync.reload]
+  gulp.watch "#{paths.src}/images/**/*.*", ['images', browserSync.reload]
   gulp.watch [
     "#{paths.src}/posts/**/*.md"
-    "#{paths.src}/layouts/**/*.jade"
+    "#{paths.src}/templates/**/*.jade"
     "#{paths.src}/index.md"
   ], ['blog', browserSync.reload]
   gulp.watch [

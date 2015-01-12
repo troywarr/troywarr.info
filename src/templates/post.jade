@@ -1,0 +1,22 @@
+doctype html
+html
+  head
+    title= self.title
+    meta(name='description', content=self.description)
+  body
+    h1= self.title
+    time= self.date
+    div!= self.contents
+
+    if self.previous
+      .next
+          a(href='../' + self.previous.path + '/index.html')= self.previous.title
+
+    if self.next
+      .next
+          a(href='../' + self.next.path + '/index.html')= self.next.title
+
+    #disqus_thread
+
+//- block scripts
+//-   $.getScript('//troywarr.disqus.com/embed.js');

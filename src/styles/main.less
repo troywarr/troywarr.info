@@ -1,5 +1,5 @@
+@import '../../node_modules/bootstrap/less/bootstrap.less'; // Twitter Bootstrap
 @import 'vendor/lesshat.less';
-@import 'lib/mixins.less';
 
 
 // fonts
@@ -33,7 +33,7 @@ h1 {
 }
 
 .social-icons {
-  .clearFix();
+  .clearfix();
   list-style: none;
   border: 5px solid #fff;
   display: table;
@@ -63,26 +63,26 @@ h1 {
 
 .icon {
   display: inline-block;
-  .box(30px);
+  .square(30);
   fill: #fff;
 }
 
 .icon-facebook {
-  .box(36px);
+  .square(36);
   margin-top: -3px;
 }
 
 .icon-twitter {
-  .box(38px);
+  .square(38);
   margin-top: -4px;
 }
 
 .icon-google-plus {
-  .box(32px);
+  .square(32);
 }
 
 .icon-github {
-  .box(32px);
+  .square(32);
   margin-top: -1px;
 }
 
